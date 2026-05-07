@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Analiz | KAÜ - HASTALIK TAHMİNİ DOSTU{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container py-4">
+        <h1 class="h2 fw-bold mb-1">Analiz Paneli</h1>
+        <p class="mb-0">Veri dağılımları, Apriori kuralları, feature importance ve model metrikleri.</p>
+    </div>
+</section>
+
+<section class="container py-4">
+    <div class="summary-strip mb-4">
+        <div><strong>{{ analytics.summary.dataset.row_count }}</strong><span>Kayıt</span></div>
+        <div><strong>{{ analytics.summary.dataset.symptom_count }}</strong><span>Belirti</span></div>
+        <div><strong>{{ analytics.summary.rules_count }}</strong><span>Kural</span></div>
+        <div><strong>{{ analytics.summary.best_model }}</strong><span>En iyi model</span></div>
+    </div>
+
+    <div class="row g-4">
+        {% for title, key in [("En sık belirtiler", "top_symptoms"), ("Hastalık dağılımı", "disease_distribution"), ("Correlation heatmap", "correlation_heatmap"), ("Confusion matrix", "confusion_matrix"), ("Support vs confidence", "support_confidence")] %}
+        <div class="col-lg-6">
+            <div class="tool-panel">
+                <h2 class="h5 fw-bold">{{ title }}</h2>
+                <img class="analysis-img" src="{{ analytics.images[key] }}" alt="{{ title }}">
+            </div>
+        </div>
+        {% endfor %}
+        <div class="col-lg-6">
+            <div class="tool-panel">
+                <h2 class="h5 fw-bold">En önemli belirtiler</h2>
+                {% for item in analytics.feature_importances[:12] %}
+                <div class="importance-row">
+                    <span>{{ item.feature }}</span>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ item.importance * 100 }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="tool-panel mt-4">
+        <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+            <h2 class="h5 fw-bold mb-0">Association Rules</h2>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('main.api_rules') }}">
+                <i class="bi bi-download me-1"></i>JSON
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                <tr>
+                    <th>Belirtiler</th>
+                    <th>Hastalık</th>
+                    <th>Support</th>
+                    <th>Confidence</th>
+                    <th>Lift</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rule in analytics.rules[:100] %}
+                <tr>
+                    <td>{{ rule.symptoms }}</td>
+                    <td><strong>{{ rule.disease }}</strong></td>
+                    <td>{{ rule.support }}</td>
+                    <td>{{ rule.confidence }}</td>
+                    <td>{{ rule.lift }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

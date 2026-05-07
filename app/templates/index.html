@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Ana Sayfa | KAÜ - HASTALIK TAHMİNİ DOSTU{% endblock %}
+
+{% block content %}
+<section class="hero-band">
+    <div class="container py-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge text-bg-light mb-3">Kafkas Üniversitesi · Veri Madenciliği</span>
+                <h1 class="display-5 fw-bold mb-3">KAÜ - HASTALIK TAHMİNİ DOSTU</h1>
+                <p class="lead mb-4">
+                    Belirti seçimlerinden Apriori birliktelik kuralları ve makine öğrenmesi modelleriyle
+                    hastalık tahmini üreten modern sağlık destek arayüzü.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-light btn-lg interactive" href="{{ url_for('main.predict_page') }}">
+                        <i class="bi bi-ui-checks-grid me-2"></i>Belirti Seç
+                    </a>
+                    <a class="btn btn-outline-light btn-lg interactive" href="{{ url_for('main.analysis_page') }}">
+                        <i class="bi bi-bar-chart-line me-2"></i>Analiz Paneli
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="doctor-visual glass-panel">
+                    <i class="bi bi-person-hearts"></i>
+                    <div>
+                        <h2 class="h4 fw-bold mb-2">Akıllı sağlık değerlendirmesi</h2>
+                        <p class="mb-0">Sabit Google Sheets verisi backend tarafından güvenli şekilde okunur; link arayüzde gösterilmez.</p>
+                    </div>
+                </div>
+                {% if error %}
+                <div class="alert alert-danger mt-3">{{ error }}</div>
+                {% endif %}
+                {% if success %}
+                <div class="alert alert-success mt-3">Model hazırlandı.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="metric-card glass-card">
+                <i class="bi bi-diagram-3 icon-pill"></i>
+                <h2>Apriori analizi</h2>
+                <p>Belirti kümeleri hastalık sonuçlarıyla eşleştirilir; support, confidence ve lift değerleri hesaplanır.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card glass-card">
+                <i class="bi bi-cpu icon-pill"></i>
+                <h2>ML sınıflandırma</h2>
+                <p>Random Forest, Logistic Regression ve Decision Tree karşılaştırılır; en iyi model otomatik seçilir.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card glass-card">
+                <i class="bi bi-hospital icon-pill"></i>
+                <h2>Branş yönlendirme</h2>
+                <p>Sonuçtan sonra kart kalabalığı olmadan tek, net doktor veya acil servis yönlendirme mesajı verilir.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if summary %}
+    <div class="summary-strip mt-5">
+        <div><strong>{{ summary.dataset.row_count }}</strong><span>Kayıt</span></div>
+        <div><strong>{{ summary.dataset.symptom_count }}</strong><span>Belirti</span></div>
+        <div><strong>{{ summary.dataset.disease_count }}</strong><span>Hastalık</span></div>
+        <div><strong>{{ summary.rules_count }}</strong><span>Apriori Kuralı</span></div>
+        <div><strong>{{ "%.2f"|format(summary.accuracy * 100) }}%</strong><span>En iyi accuracy</span></div>
+    </div>
+    {% else %}
+    <div class="medical-loader mt-5">
+        <span></span>
+        <p>Model, belirti seçim ekranına geçtiğinizde sabit veri kaynağından otomatik hazırlanır.</p>
+    </div>
+    {% endif %}
+</section>
+
+<section class="container py-4" id="pharmacySection">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+        <div>
+            <h2 class="h3 fw-bold mb-1">Kars Nöbetçi Eczaneler</h2>
+            <p class="text-secondary mb-0">Canlı kaynak üzerinden çekilir ve yatay slider olarak gösterilir.</p>
+        </div>
+        <button class="btn btn-outline-primary interactive" id="refreshPharmacies" type="button">
+            <i class="bi bi-arrow-clockwise me-1"></i>Yenile
+        </button>
+    </div>
+    <div class="pharmacy-carousel" id="pharmacyCarousel">
+        <div class="medical-loader compact"><span></span><p>Eczaneler yükleniyor...</p></div>
+    </div>
+</section>
+{% endblock %}

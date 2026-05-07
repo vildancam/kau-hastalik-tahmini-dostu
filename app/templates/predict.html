@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Belirti Seç | KAÜ - HASTALIK TAHMİNİ DOSTU{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container py-4">
+        <h1 class="h2 fw-bold mb-1">Belirti Seçimi</h1>
+        <p class="mb-0">Modern toggle kartlardan belirtileri seçin; tahmin sayfa yenilenmeden hesaplanır.</p>
+    </div>
+</section>
+
+<section class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="tool-panel glass-card">
+                <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center mb-3">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input class="form-control" id="symptomSearch" placeholder="Belirti ara...">
+                    </div>
+                    <button class="btn btn-outline-secondary interactive" type="button" id="clearSymptoms">
+                        <i class="bi bi-x-circle me-1"></i>Temizle
+                    </button>
+                </div>
+
+                <form id="predictForm" method="post" action="{{ url_for('main.result_page') }}">
+                    <div class="symptom-grid" id="symptomGrid">
+                        {% for symptom in symptoms %}
+                        <label class="symptom-item toggle-card interactive" data-name="{{ symptom|lower }}">
+                            <input class="symptom-checkbox" type="checkbox" name="symptoms" value="{{ symptom }}">
+                            <span class="symptom-icon"><i class="bi bi-heart-pulse"></i></span>
+                            <span class="symptom-name">{{ symptom }}</span>
+                            <span class="toggle-dot"></span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 mt-4">
+                        <button class="btn btn-primary btn-lg interactive" type="button" id="ajaxPredict">
+                            <span class="medical-pulse d-none" id="predictPulse"></span>
+                            <i class="bi bi-lightning-charge me-1"></i>Tahmin Et
+                        </button>
+                        <button class="btn btn-outline-primary btn-lg interactive" type="submit">
+                            <i class="bi bi-file-earmark-medical me-1"></i>Klasik Sonuç
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="tool-panel glass-card sticky-lg-top side-summary">
+                <h2 class="h5 fw-bold">Model Durumu</h2>
+                <dl class="row mb-0">
+                    <dt class="col-7">En iyi model</dt>
+                    <dd class="col-5">{{ summary.best_model }}</dd>
+                    <dt class="col-7">Accuracy</dt>
+                    <dd class="col-5">{{ "%.2f"|format(summary.accuracy * 100) }}%</dd>
+                    <dt class="col-7">Belirti sayısı</dt>
+                    <dd class="col-5">{{ summary.dataset.symptom_count }}</dd>
+                </dl>
+                <div id="ajaxResult" class="mt-3 ajax-result"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-4" id="pharmacySection">
+    <h2 class="h4 fw-bold mb-3">Kars Nöbetçi Eczaneler</h2>
+    <div class="pharmacy-carousel" id="pharmacyCarousel">
+        <div class="medical-loader compact"><span></span><p>Eczaneler yükleniyor...</p></div>
+    </div>
+</section>
+{% endblock %}

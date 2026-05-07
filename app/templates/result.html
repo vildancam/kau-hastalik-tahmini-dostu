@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Sonuç | KAÜ - HASTALIK TAHMİNİ DOSTU{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container py-4">
+        <h1 class="h2 fw-bold mb-1">Tahmin Sonucu</h1>
+        <p class="mb-0">Apriori ve makine öğrenmesi sonuçları birlikte değerlendirilmiştir.</p>
+    </div>
+</section>
+
+<section class="container py-4">
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    {% if result %}
+    <div class="result-card">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+            <div>
+                <span class="badge text-bg-primary mb-2">Tahmin edilen hastalık</span>
+                <h2 class="display-6 fw-bold">{{ result.hastalik }}</h2>
+                <p class="text-secondary mb-0">Model: {{ result.model }} · Accuracy: {{ result.model_accuracy }}%</p>
+            </div>
+            <div class="score-circle">{{ result.olasilik }}%</div>
+        </div>
+        <div class="row g-3 mt-3">
+            <div class="col-md-3"><div class="mini-stat">Confidence<strong>{{ result.confidence }}</strong></div></div>
+            <div class="col-md-3"><div class="mini-stat">Support<strong>{{ result.support }}</strong></div></div>
+            <div class="col-md-3"><div class="mini-stat">Lift<strong>{{ result.lift }}</strong></div></div>
+            <div class="col-md-3"><div class="mini-stat">ML Olasılık<strong>{{ result.ml_olasilik }}%</strong></div></div>
+        </div>
+        <div class="referral-message mt-4 {% if result.yonlendirme.acil %}urgent{% endif %}">
+            <i class="bi bi-hospital me-2"></i>
+            <strong>YÖNLENDİRME MESAJI:</strong>
+            {{ result.yonlendirme.mesaj }}
+        </div>
+    </div>
+
+    <div class="row g-4 mt-1">
+        <div class="col-lg-6">
+            <div class="tool-panel">
+                <h3 class="h5 fw-bold">Seçilen belirtiler</h3>
+                <div class="tag-wrap">
+                    {% for symptom in result.secilen_belirtiler %}
+                    <span class="tag">{{ symptom }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="tool-panel">
+                <h3 class="h5 fw-bold">Alternatif hastalıklar</h3>
+                {% for item in result.alternatifler %}
+                <div class="alt-row">
+                    <span>{{ item.hastalik }}</span>
+                    <strong>{{ item.olasilik }}%</strong>
+                </div>
+                {% else %}
+                <p class="text-secondary mb-0">Alternatif bulunamadı.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+        <a href="{{ url_for('main.predict_page') }}" class="btn btn-primary"><i class="bi bi-arrow-left me-1"></i>Yeni Tahmin</a>
+        <button class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-filetype-pdf me-1"></i>PDF Yazdır</button>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
